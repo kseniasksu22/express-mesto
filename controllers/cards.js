@@ -6,7 +6,7 @@ const cardsDataPath = path.join(__dirname, "..", "data", "cards.json");
 const getCards = (req, res) => {
   return getDataFromFile(cardsDataPath)
     .then((data) => res.status(200).send(data))
-    .catch((err) => res.status(404).send(err));
+    .catch((error) => res.status(500).send({ message: error.message }));
 };
 
 module.exports = getCards;

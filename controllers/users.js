@@ -6,7 +6,7 @@ const usersDataPath = path.join(__dirname, "..", "data", "users.json");
 const getUsers = (req, res) => {
   return getDataFromFile(usersDataPath)
     .then((data) => res.status(200).send(data))
-    .catch((err) => res.status(404).send(err));
+    .catch((error) => res.status(500).send({ message: error.message }));
 };
 
 const getuser = (req, res) => {
@@ -18,6 +18,6 @@ const getuser = (req, res) => {
       }
       res.status(200).send(user);
     })
-    .catch((err) => res.status(404).send(err));
+    .catch((error) => res.status(500).send({ message: error.message }));
 };
 module.exports = { getUsers, getuser };
