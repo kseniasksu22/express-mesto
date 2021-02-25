@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 const app = express();
 const PORT = 3000;
-const path = require("path");
+
 const parser = require("body-parser");
 const usersRouter = require("./routes/users.js");
 const cardsRouter = require("./routes/cards.js");
@@ -17,7 +17,7 @@ mongoose
   .then(() => {
     console.log("database loooooooooool");
   });
-app.use(express.static(path.join(__dirname, "public")));
+
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 app.use((req, res, next) => {
