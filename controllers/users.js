@@ -1,10 +1,7 @@
-const path = require("path");
-const getDataFromFile = require("../helpers/files");
-
-const usersDataPath = path.join(__dirname, "..", "data", "users.json");
+const User = require("../models/user");
 
 const getUsers = (req, res) => {
-  return getDataFromFile(usersDataPath)
+  User.find({})
     .then((data) => res.status(200).send(data))
     .catch(() => {
       res.status(500).send({ message: "Ошибка сервера" });
@@ -12,8 +9,7 @@ const getUsers = (req, res) => {
 };
 
 const getuser = (req, res) => {
-  return getDataFromFile(usersDataPath)
-    .then((users) => users.find((user) => user._id === req.params.id))
+  User.findOne({ id: req.params._id })
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: "Нет пользователя с таким id" });
@@ -24,4 +20,59 @@ const getuser = (req, res) => {
       res.status(500).send({ error: "Ошибка сервера" });
     });
 };
-module.exports = { getUsers, getuser };
+
+const createUser = (req, res) => {
+  const { name, about, avatar } = req.body;
+  User.create({ name, about, avatar })
+    .then((user) => {
+      res.send({ name: user.name, about: user.about, avatar });
+    })
+    .catch((error) => {
+      if (error.name === "ValidationError") {
+        res.status(400).send({ message: "Введите от 2 до 40 символов" });
+      } else {
+        res.status(500).send({ error: "Ошибка сервера" });
+      }
+    });
+};
+
+const updateUserInfo = (req, res) => {
+  const { name, about } = req.body;
+  User.findByIdAndUpdate(req.user._id, { name, about })
+    .then((user) => {
+      res.send({ data: user });
+    })
+    .catch((error) => {
+      if (error.name === "ValidationError") {
+        res.status(400).send({ message: "Введите от 2 до 40 символов" });
+      } else {
+        res.status(500).send({ error: "Ошибка сервера" });
+      }
+    });
+};
+const updateUserAvatar = (req, res) => {
+  const { avatar } = req.body;
+  User.findByIdAndUpdate(
+    req.user._id,
+    { avatar },
+    { new: true, runValidators: true }
+  )
+    .then((user) => {
+      res.send({ data: user });
+    })
+    .catch((error) => {
+      console.log(error);
+      if (error.name === "ValidationError") {
+        res.status(400).send({ message: "Некорректный URL" });
+      } else {
+        res.status(500).send({ error: "Ошибка сервера" });
+      }
+    });
+};
+module.exports = {
+  getUsers,
+  getuser,
+  createUser,
+  updateUserInfo,
+  updateUserAvatar,
+};
