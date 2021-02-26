@@ -4,7 +4,9 @@ const getCards = (req, res) => {
   cardModel
     .find({})
     .populate("creator")
-    .then((cards) => res.status(200).send(cards))
+    .then((cards) => {
+      res.send(cards);
+    })
     .catch(() => {
       res.status(500).send({ error: "Ошибка сервера" });
     });
@@ -15,7 +17,7 @@ const createCard = (req, res) => {
   cardModel
     .create({ name, link, creator: req.user._id })
     .then((cards) => {
-      res.status(200).send({ data: cards });
+      res.send({ data: cards });
     })
     .catch((error) => {
       if (error.name === "ValidationError") {
@@ -30,11 +32,41 @@ const deleteCard = (req, res) => {
   cardModel
     .findByIdAndDelete(req.user._id)
     .then(() => {
-      res.status(200).send({ message: "Вы удалили каточку" });
+      res.send({ message: "Вы удалили каточку" });
     })
     .catch(() => {
       res.status(500).send({ error: "Ошибка сервера" });
     });
 };
 
-module.exports = { getCards, createCard, deleteCard };
+const likeCard = (req, res) => {
+  cardModel
+    .findByIdAndUpdate(
+      req.params.cardId,
+      { $addToSet: { likes: req.user._id } },
+      { new: true }
+    )
+    .then((card) => {
+      res.send({ likes: card });
+    })
+    .catch(() => {
+      res.status(500).send({ error: "Ошибка сервера" });
+    });
+};
+
+const dislikeCard = (req, res) => {
+  cardModel
+    .findByIdAndUpdate(
+      req.params.cardId,
+      { $pull: { likes: req.user._id } },
+      { new: true }
+    )
+    .then((card) => {
+      res.send({ likes: card });
+    })
+    .catch(() => {
+      res.status(500).send({ error: "Ошибка сервера" });
+    });
+};
+
+module.exports = { getCards, createCard, deleteCard, likeCard, dislikeCard };
