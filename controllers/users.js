@@ -2,19 +2,21 @@ const User = require("../models/user");
 
 const getUsers = (req, res) => {
   User.find({})
-    .then((data) => res.status(200).send(data))
+    .then((data) => {
+      res.send(data);
+    })
     .catch(() => {
       res.status(500).send({ message: "Ошибка сервера" });
     });
 };
 
 const getuser = (req, res) => {
-  User.findOne({ id: req.params._id })
+  User.findById(req.params._id)
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: "Нет пользователя с таким id" });
       }
-      res.status(200).send(user);
+      return res.status(200).send(user);
     })
     .catch(() => {
       res.status(500).send({ error: "Ошибка сервера" });
@@ -38,8 +40,14 @@ const createUser = (req, res) => {
 
 const updateUserInfo = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about })
+  console.log(req.body);
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, about },
+    { new: true, runValidators: true }
+  )
     .then((user) => {
+      console.log(user);
       res.send({ data: user });
     })
     .catch((error) => {
@@ -57,8 +65,8 @@ const updateUserAvatar = (req, res) => {
     { avatar },
     { new: true, runValidators: true }
   )
-    .then((user) => {
-      res.send({ data: user });
+    .then((data) => {
+      res.send(data);
     })
     .catch((error) => {
       console.log(error);

@@ -15,14 +15,14 @@ mongoose
     useFindAndModify: false,
   })
   .then(() => {
-    console.log("database loooooooooool");
+    console.log("database");
   });
 
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   req.user = {
-    _id: "60365e2ef06d774e0c6c2728",
+    _id: "6038ecb0333fed3fc06cbcc2",
   };
 
   next();
