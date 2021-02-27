@@ -4,13 +4,15 @@ const cardSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    minlength: 2,
+    maxlength: 40
   },
   link: {
     type: String,
     required: true,
     validate: {
       validator(link) {
-        return /(http|https):\/\//.test(link);
+        return /(http|https):\/\/\w{0,}\./.test(link);
       },
     },
   },

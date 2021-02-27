@@ -1,10 +1,18 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 const app = express();
 const PORT = 3000;
 
 const parser = require("body-parser");
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200
+});
+
 const usersRouter = require("./routes/users.js");
 const cardsRouter = require("./routes/cards.js");
 
@@ -17,7 +25,8 @@ mongoose
   .then(() => {
     console.log("database");
   });
-
+app.use(limiter);
+app.use(helmet());
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 app.use((req, res, next) => {

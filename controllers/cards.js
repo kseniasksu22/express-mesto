@@ -21,7 +21,7 @@ const createCard = (req, res) => {
     })
     .catch((error) => {
       if (error.name === "ValidationError") {
-        res.status(400).send({ message: "Некорректный Url" });
+        res.status(400).send({ message: "Некорректный Url или название" });
       } else {
         res.status(500).send({ error: "Ошибка сервера" });
       }
@@ -30,12 +30,19 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   cardModel
-    .findByIdAndDelete(req.user._id)
-    .then(() => {
-      res.send({ message: "Вы удалили каточку" });
-    })
-    .catch(() => {
-      res.status(500).send({ error: "Ошибка сервера" });
+    .findByIdAndDelete(req.params.cardId)
+    .then((card) => {
+      if (!card) {
+        res.status(404).send({ message: "Kаточка не найдена" });
+        return;
+      }
+      res.status(200).send(card);
+    }).catch((error) => {
+      if (error.name === "CastError") {
+        res.status(400).send({ message: "Некорректные данные" });
+      } else {
+        res.status(500).send({ message: "Ошибка сервера" });
+      }
     });
 };
 
@@ -47,10 +54,18 @@ const likeCard = (req, res) => {
       { new: true }
     )
     .then((card) => {
+      if (!card) {
+        res.status(404).send({ message: "Ресурс не найден" });
+        return;
+      }
       res.send({ likes: card });
     })
-    .catch(() => {
-      res.status(500).send({ error: "Ошибка сервера" });
+    .catch((error) => {
+      if (error.name === "CastError") {
+        res.status(400).send({ message: "Некорректные данные" });
+      } else {
+        res.status(500).send({ message: "Ошибка сервера" });
+      }
     });
 };
 
@@ -62,11 +77,25 @@ const dislikeCard = (req, res) => {
       { new: true }
     )
     .then((card) => {
+      if (!card) {
+        res.status(404).send({ message: "Ресурс не найден" });
+        return;
+      }
       res.send({ likes: card });
     })
-    .catch(() => {
-      res.status(500).send({ error: "Ошибка сервера" });
+    .catch((error) => {
+      if (error.name === "CastError") {
+        res.status(400).send({ message: "Некорректные данные" });
+      } else {
+        res.status(500).send({ message: "Ошибка сервера" });
+      }
     });
 };
 
-module.exports = { getCards, createCard, deleteCard, likeCard, dislikeCard };
+module.exports = {
+  getCards,
+  createCard,
+  deleteCard,
+  likeCard,
+  dislikeCard,
+};

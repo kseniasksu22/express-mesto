@@ -14,12 +14,17 @@ const getuser = (req, res) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: "Нет пользователя с таким id" });
+        res.status(404).send({ message: "Ресурс не найден" });
+        return;
       }
-      return res.status(200).send(user);
+      res.status(200).send(user);
     })
-    .catch(() => {
-      res.status(500).send({ error: "Ошибка сервера" });
+    .catch((error) => {
+      if (error.name === "CastError") {
+        res.status(400).send({ message: "Некорректные данные" });
+      } else {
+        res.status(500).send({ message: "Ошибка сервера" });
+      }
     });
 };
 
@@ -44,7 +49,7 @@ const updateUserInfo = (req, res) => {
   User.findByIdAndUpdate(
     req.user._id,
     { name, about },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .then((user) => {
       console.log(user);
@@ -53,11 +58,14 @@ const updateUserInfo = (req, res) => {
     .catch((error) => {
       if (error.name === "ValidationError") {
         res.status(400).send({ message: "Введите от 2 до 40 символов" });
+      } else if (error.name === "NotFound") {
+        res.status(404).send({ message: "Ресурс не найден" });
       } else {
         res.status(500).send({ error: "Ошибка сервера" });
       }
     });
 };
+
 const updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
@@ -69,14 +77,16 @@ const updateUserAvatar = (req, res) => {
       res.send(data);
     })
     .catch((error) => {
-      console.log(error);
       if (error.name === "ValidationError") {
         res.status(400).send({ message: "Некорректный URL" });
+      } else if (error.name === "NotFound") {
+        res.status(404).send({ message: "Ресурс не найден" });
       } else {
         res.status(500).send({ error: "Ошибка сервера" });
       }
     });
 };
+
 module.exports = {
   getUsers,
   getuser,
