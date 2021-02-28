@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator(link) {
-        return /(http|https):\/\//.test(link);
+        return /(http|https):\/\/\w{0,}\./.test(link);
       },
     },
   },

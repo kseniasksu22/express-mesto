@@ -36,7 +36,7 @@ const createUser = (req, res) => {
     })
     .catch((error) => {
       if (error.name === "ValidationError") {
-        res.status(400).send({ message: "Введите от 2 до 40 символов" });
+        res.status(400).send({ message: "Некорректные данные" });
       } else {
         res.status(500).send({ error: "Ошибка сервера" });
       }
