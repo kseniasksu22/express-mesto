@@ -1,13 +1,26 @@
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-const getUsers = (req, res) => {
+const { NODE_ENV, JWT_SECRET } = process.env;
+
+const getUsers = (req, res, next) => {
   User.find({})
-    .then((data) => {
-      res.send(data);
+    .then((user) => {
+      res.send({ user: user });
     })
-    .catch(() => {
-      res.status(500).send({ message: "Ошибка сервера" });
-    });
+    .catch(next);
+};
+
+const getCurrentUser = (req, res, next) => {
+  User.findById(req.user.id)
+    .then((user) => {
+      if (!user) {
+        res.status(400).send({ message: "Неккоректные данные" });
+      }
+      return res.send({ user: user });
+    })
+    .catch(next);
 };
 
 const getuser = (req, res) => {
@@ -15,32 +28,54 @@ const getuser = (req, res) => {
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: "Ресурс не найден" });
-        return;
       }
-      res.status(200).send(user);
+      res.status(200).send({ user: user });
     })
     .catch((error) => {
       if (error.name === "CastError") {
-        res.status(400).send({ message: "Некорректные данные" });
+        res.status(404).send({ message: "Неккоректные данные" });
       } else {
         res.status(500).send({ message: "Ошибка сервера" });
       }
     });
 };
 
-const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => {
-      res.send({ name: user.name, about: user.about, avatar });
+const createUser = (req, res, next) => {
+  const {
+    email,
+    password,
+    name,
+    about,
+    avatar,
+  } = req.body;
+
+  if (!email || !password) {
+    res.status(400).send({ message: "Неккоректные данныею Передайте правильные почту или пароль" });
+  }
+  User.findOne({ email }).then((data) => {
+    if (data) {
+      res.status(409).send({ message: "Пользователь с такой почтой уже зарегистрирован" });
+    }
+    return bcrypt.hash(password, 10);
+  })
+    .then((hash) => {
+      User.create({
+        email,
+        password: hash,
+        name,
+        about,
+        avatar,
+      });
     })
-    .catch((error) => {
-      if (error.name === "ValidationError") {
-        res.status(400).send({ message: "Некорректные данные" });
-      } else {
-        res.status(500).send({ error: "Ошибка сервера" });
-      }
-    });
+    .then((user) => {
+      // eslint-disable-next-line max-len
+      res.status(201).send(
+        {
+          name: user.name, about: user.about, avatar: user.avatar, email: user.email
+        }
+      );
+    })
+    .catch(next);
 };
 
 const updateUserInfo = (req, res) => {
@@ -57,11 +92,11 @@ const updateUserInfo = (req, res) => {
     })
     .catch((error) => {
       if (error.name === "ValidationError") {
-        res.status(400).send({ message: "Введите от 2 до 40 символов" });
+        res.status(404).send({ message: "Неккоректные данные" });
       } else if (error.name === "NotFound") {
         res.status(404).send({ message: "Ресурс не найден" });
       } else {
-        res.status(500).send({ error: "Ошибка сервера" });
+        res.status(500).send({ message: "Ошибка сервера" });
       }
     });
 };
@@ -78,19 +113,36 @@ const updateUserAvatar = (req, res) => {
     })
     .catch((error) => {
       if (error.name === "ValidationError") {
-        res.status(400).send({ message: "Некорректный URL" });
-      } else if (error.name === "NotFound") {
-        res.status(404).send({ message: "Ресурс не найден" });
+        res.status(404).send({ message: "Неккоректные данные" });
       } else {
-        res.status(500).send({ error: "Ошибка сервера" });
+        res.status(500).send({ message: "Ошибка сервера" });
       }
     });
 };
 
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    res.status(400).send({ message: "Неккоректные данныею Передайте правильные почту или пароль" });
+  }
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
+        { expiresIn: "7d" },
+      );
+      res.status(201).send(token);
+    })
+    .catch(next);
+};
 module.exports = {
   getUsers,
   getuser,
   createUser,
   updateUserInfo,
   updateUserAvatar,
+  login,
+  getCurrentUser,
+
 };
