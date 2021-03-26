@@ -21,7 +21,7 @@ const PORT = 3006;
 const options = {
   origin: [
     "http://localhost:3006",
-    "https://express-mesto-apik.nomoredomains.icu",
+    "https://api.express-mesto-apik.nomoredomains.icu",
     "https://github.com/kseniasksu22/express-mesto.git",
   ],
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],  preflightContinue: false,  optionsSuccessStatus: 204,  allowedHeaders: ["Content-Type", "origin", "Authorization"],  credentials: true,};
