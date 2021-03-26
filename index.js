@@ -1,7 +1,6 @@
 const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
-const rateLimit = require("express-rate-limit");
 const { errors } = require("celebrate");
 require("dotenv").config();
 const parser = require("body-parser");
@@ -16,11 +15,6 @@ const auth = require("./middlewares/auth");
 
 const app = express();
 const PORT = 3006;
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 200
-});
 
 const usersRouter = require("./routes/users.js");
 const cardsRouter = require("./routes/cards.js");
