@@ -30,7 +30,11 @@ mongoose
     console.log("database");
   });
 
-app.use(cors());
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 
