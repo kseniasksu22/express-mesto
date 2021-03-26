@@ -11,6 +11,19 @@ const {
 const { loginValidator, validateUser } = require("./middlewares/validator");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
+const options = {
+  origin: [
+    "http://localhost:3000",
+    "https://express-mesto-apik.nomoredomains.icu",
+    "https://github.com/kseniasksu22/express-mesto.git",
+  ],
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+  preflightContinue: false,
+  optionsSuccessStatus: 200,
+  allowedHeaders: ["Content-Type", "origin", "Authorization"],
+  credentials: true
+};
+
 const auth = require("./middlewares/auth");
 
 const app = express();
@@ -30,11 +43,7 @@ mongoose
     console.log("database");
   });
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+app.use("*", cors(options));
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 
