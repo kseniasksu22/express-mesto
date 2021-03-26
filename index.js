@@ -18,13 +18,6 @@ const auth = require("./middlewares/auth");
 const app = express();
 const PORT = 3006;
 
-const options = {
-  origin: [
-    "http://localhost:3006",
-    "https://api.express-mesto-apik.nomoredomains.icu",
-    "https://github.com/kseniasksu22/express-mesto.git",
-  ],
-  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],  preflightContinue: false,  optionsSuccessStatus: 204,  allowedHeaders: ["Content-Type", "origin", "Authorization"],  credentials: true,};
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 200
@@ -44,7 +37,7 @@ mongoose
     console.log("database");
   });
 
-app.use("*", cors(options));
+app.use("*", cors());
 app.use(limiter);
 app.use(helmet());
 app.use(parser.json());
