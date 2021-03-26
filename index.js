@@ -20,7 +20,7 @@ const PORT = 3006;
 
 const options = {
   origin: [
-    "http://localhost:3000",
+    "http://localhost:3006",
     "https://express-mesto-apik.nomoredomains.icu",
     "https://github.com/kseniasksu22/express-mesto.git",
   ],
@@ -44,7 +44,7 @@ mongoose
     console.log("database");
   });
 
-  app.use("*", cors(options));
+app.use("*", cors(options));
 app.use(limiter);
 app.use(helmet());
 app.use(parser.json());
