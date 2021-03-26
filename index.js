@@ -1,7 +1,6 @@
 const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
-const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const { errors } = require("celebrate");
 require("dotenv").config();
@@ -46,7 +45,6 @@ mongoose
 
 app.use("*", cors(options));
 app.use(limiter);
-app.use(helmet());
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 
