@@ -31,7 +31,6 @@ mongoose
   });
 
 app.use(cors());
-app.use(limiter);
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 
