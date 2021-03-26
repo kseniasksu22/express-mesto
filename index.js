@@ -14,7 +14,7 @@ const { requestLogger, errorLogger } = require("./middlewares/logger");
 const auth = require("./middlewares/auth");
 
 const app = express();
-const PORT = 3006;
+const PORT = 3000;
 
 const usersRouter = require("./routes/users.js");
 const cardsRouter = require("./routes/cards.js");
