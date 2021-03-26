@@ -42,40 +42,32 @@ const getuser = (req, res) => {
 
 const createUser = (req, res, next) => {
   const {
-    email,
-    password,
-    name,
-    about,
-    avatar,
+    name, about, avatar, email, password,
   } = req.body;
 
   if (!email || !password) {
-    res.status(400).send({ message: "Неккоректные данныею Передайте правильные почту или пароль" });
+    res.status(404).send({ message: "Передайте почту или пароль" });
   }
-  User.findOne({ email }).then((data) => {
-    if (data) {
-      res.status(409).send({ message: "Пользователь с такой почтой уже зарегистрирован" });
-    }
-    return bcrypt.hash(password, 10);
-  })
-    .then((hash) => {
-      User.create({
-        email,
-        password: hash,
-        name,
-        about,
-        avatar,
-      });
-    })
+
+  User.findOne({ email })
     .then((user) => {
-      // eslint-disable-next-line max-len
-      res.status(201).send(
-        {
-          name: user.name, about: user.about, avatar: user.avatar, email: user.email
-        }
-      );
+      if (user) {
+        res.status(409).send({ message: "Пользователь с таким email уже существует" });
+      }
+      return bcrypt.hash(password, 10);
     })
-    .catch(next);
+    // eslint-disable-next-line arrow-body-style
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((user) => {res.status(200).send({
+      email: user.email,
+      _id: user._id,
+    });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 const updateUserInfo = (req, res) => {
