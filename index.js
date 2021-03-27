@@ -14,7 +14,7 @@ const { requestLogger, errorLogger } = require("./middlewares/logger");
 const options = {
   origin: [
     "http://localhost:3000",
-    "https://express-mesto-apik.nomoredomains.icu",
+    "https://api.express-mesto-apik.nomoredomains.icu",
     "https://github.com/kseniasksu22/express-mesto.git",
   ],
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
