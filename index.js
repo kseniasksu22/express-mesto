@@ -12,10 +12,10 @@ const { loginValidator, validateUser } = require("./middlewares/validator");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const options = {
-  allowedHeaders: ["sessionId", "Content-Type", "Authorization"],
-  exposedHeaders: ["sessionId"],
+  allowedHeaders: ["*"],
+  exposedHeaders: ["*"],
   origin: "*",
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  methods: "*",
   preflightContinue: false
 };
 
