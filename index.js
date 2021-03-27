@@ -12,16 +12,11 @@ const { loginValidator, validateUser } = require("./middlewares/validator");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const options = {
-  origin: [
-    "http://localhost:3000",
-    "https://express-mesto-apik.nomoredomains.icu",
-    "https://github.com/kseniasksu22/express-mesto.git",
-  ],
-  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
-  preflightContinue: false,
-  optionsSuccessStatus: 200,
-  allowedHeaders: ["Content-Type", "origin", "Authorization"],
-  credentials: true
+  allowedHeaders: ["sessionId", "Content-Type", "Authorization"],
+  exposedHeaders: ["sessionId"],
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false
 };
 
 const auth = require("./middlewares/auth");
