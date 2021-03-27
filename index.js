@@ -51,9 +51,9 @@ app.use(requestLogger);
 
 app.post("/signin", loginValidator, login);
 app.post("/signup", validateUser, createUser);
-app.use("/main", usersRouter);
+app.use("/main", auth, usersRouter);
 
-app.use("/main", cardsRouter);
+app.use("/main", auth, cardsRouter);
 
 app.use(errorLogger);
 app.use(errors());
