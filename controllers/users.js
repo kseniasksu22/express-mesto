@@ -13,12 +13,12 @@ const getUsers = (req, res, next) => {
 };
 
 const getCurrentUser = (req, res, next) => {
-  User.findById(req.user.id)
+  User.findById(req.user._id)
     .then((user) => {
       if (!user) {
         res.status(400).send({ message: "Неккоректные данные" });
       }
-      return res.send({ user: user });
+      return res.send({ data: user });
     })
     .catch(next);
 };
@@ -42,32 +42,40 @@ const getuser = (req, res) => {
 
 const createUser = (req, res, next) => {
   const {
-    name, about, avatar, email, password,
+    email,
+    password,
+    name,
+    about,
+    avatar,
   } = req.body;
 
   if (!email || !password) {
-    res.status(404).send({ message: "Передайте почту или пароль" });
+    res.status(400).send({ message: "Неккоректные данныею Передайте правильные почту или пароль" });
   }
-
-  User.findOne({ email })
+  User.findOne({ email }).then((data) => {
+    if (data) {
+      res.status(409).send({ message: "Пользователь с такой почтой уже зарегистрирован" });
+    }
+    return bcrypt.hash(password, 10);
+  })
+    .then((hash) => {
+      User.create({
+        email,
+        password: hash,
+        name,
+        about,
+        avatar,
+      });
+    })
     .then((user) => {
-      if (user) {
-        res.status(409).send({ message: "Пользователь с таким email уже существует" });
-      }
-      return bcrypt.hash(password, 10);
+      // eslint-disable-next-line max-len
+      res.status(201).send(
+        {
+          data: user
+        }
+      );
     })
-    // eslint-disable-next-line arrow-body-style
-    .then((hash) => User.create({
-      name, about, avatar, email, password: hash,
-    }))
-    .then((user) => {res.status(200).send({
-      email: user.email,
-      _id: user._id,
-    });
-    })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 const updateUserInfo = (req, res) => {
@@ -124,7 +132,7 @@ const login = (req, res, next) => {
         NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
         { expiresIn: "7d" },
       );
-      res.status(201).send(token);
+      res.status(201).send({ token: token });
     })
     .catch(next);
 };

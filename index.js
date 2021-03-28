@@ -1,6 +1,8 @@
-const cors = require("cors");
 const express = require("express");
+const cors = require("cors");
 const mongoose = require("mongoose");
+
+const rateLimit = require("express-rate-limit");
 const { errors } = require("celebrate");
 require("dotenv").config();
 const parser = require("body-parser");
@@ -11,18 +13,29 @@ const {
 const { loginValidator, validateUser } = require("./middlewares/validator");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
-const options = {
-  allowedHeaders: ["sessionId", "Content-Type", "Authorization"],
-  exposedHeaders: ["sessionId"],
-  origin: "*",
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  preflightContinue: false
-};
-
 const auth = require("./middlewares/auth");
 
 const app = express();
 const PORT = 3000;
+
+const options = {
+  origin: [
+    "http://localhost:3000",
+    "https://express-mesto-apik.nomoredomains.icu",
+    "https://github.com/kseniasksu22/react-mesto-api-full.git",
+
+  ],
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+  allowedHeaders: ["Content-Type", "origin", "Authorization"],
+  credentials: true,
+};
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20000
+});
 
 const usersRouter = require("./routes/users.js");
 const cardsRouter = require("./routes/cards.js");
@@ -37,8 +50,8 @@ mongoose
   .then(() => {
     console.log("database");
   });
-
-app.use("*", cors(options));
+app.use('*', cors(options));
+app.use(limiter);
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 
@@ -46,9 +59,9 @@ app.use(requestLogger);
 
 app.post("/signin", loginValidator, login);
 app.post("/signup", validateUser, createUser);
-app.use("/main", auth, usersRouter);
+app.use("/", auth, usersRouter);
 
-app.use("/main", auth, cardsRouter);
+app.use("/", auth, cardsRouter);
 
 app.use(errorLogger);
 app.use(errors());

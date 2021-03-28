@@ -11,8 +11,8 @@ const {
 const { userInfoValidalidator, avatarValidator } = require("../middlewares/validator");
 
 router.get("/users", getUsers);
-router.get("/users/:userId", getuser);
 router.get("/users/me", getCurrentUser);
+router.get("/users/:userId", getuser);
 router.patch("/users/me", userInfoValidalidator, updateUserInfo);
 router.patch("/users/me/avatar", avatarValidator, updateUserAvatar);
 router.post("/signin", login);
