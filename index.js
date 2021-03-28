@@ -22,6 +22,9 @@ const options = {
   origin: [
     "http://localhost:3000",
     "https://express-mesto-apik.nomoredomains.icu",
+    "http://express-mesto-apik.nomoredomains.icu",
+    "https://api.express-mesto-apik.nomoredomains.icu",
+    "http://api.express-mesto-apik.nomoredomains.icu",
     "https://github.com/kseniasksu22/react-mesto-api-full.git",
 
   ],
