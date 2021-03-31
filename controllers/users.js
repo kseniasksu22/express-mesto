@@ -37,8 +37,12 @@ const getuser = (req, res, next) => {
       res.status(200).send({ user: user });
     })
     .catch((error) => {
-      next(error);
-    });
+      if (error.statusCode === 404) {
+        throw new NotFoundErr("Пользователя с таким id не найдено");
+      } else {
+        throw new ServerErr("Ошибка сервера");
+      }
+    }).catch(next);
 };
 
 const createUser = (req, res, next) => {
